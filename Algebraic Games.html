@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Алгебраические Игры</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sidebar.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
+        async></script>
+</head>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        margin-top: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: #0056b3;
+    }
+
+    .problem {
+        margin: 20px 0;
+    }
+
+    .answer {
+        margin-top: 10px;
+    }
+
+    button {
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        margin: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    label {
+        margin: 10px;
+    }
+
+    input {
+        margin: 10px;
+        margin-left: 0;
+    }
+
+    #gameBoard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin: 20px;
+    }
+
+    .card {
+        width: 170px;
+        height: 100px;
+        background-color: #f0f0f0;
+        border-radius: 7px;
+        display: inline-block;
+        margin: 5px;
+        text-align: center;
+        vertical-align: top;
+        line-height: 100px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .flipped,
+    .matched {
+        background-color: #6dfff8;
+    }
+
+    #container {
+        width: 800px;
+        margin: 20px auto;
+        text-align: center;
+        position: relative;
+    }
+
+    .expression-container {
+        display: inline-block;
+        position: relative;
+    }
+
+    .expression-container .operator {
+        display: inline-block;
+        margin: 0 5px;
+        font-size: 24px;
+        color: #333;
+        border-radius: 5px;
+        background-color: #f5f5f5;
+        padding: 5px 10px;
+    }
+
+    .expression-container .dropzone {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: 0 5px;
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #fff;
+    }
+
+    #cards {
+        display: inline-block;
+    }
+
+    .number {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: inline-block;
+        margin: 0 5px;
+        cursor: grab;
+        text-align: center;
+        font-size: 18px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .correct {
+        background-color: lightgreen;
+        border-color: #99cc99;
+        box-shadow: 0 0 5px rgba(0, 200, 0, 0.3);
+        background-color: #99cc99;
+    }
+
+    .incorrect {
+        background-color: tomato;
+        border-color: #cc9999;
+        box-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
+    }
+
+    .game-container {
+        background: radial-gradient(circle at 50%, #352849, #07004b, #004964, #311b81);
+        background-size: 400% 400%;
+        animation: gradientAnimation 30s ease infinite;
+        z-index: -1;
+    }
+
+    .star {
+        position: absolute;
+        width: 7px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        pointer-events: none;
+        transform: rotate(45deg);
+        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        /* Чтобы звезды не мешали кликам на других элементах */
+    }
+
+    /* Можете добавить анимацию для звезд, чтобы они медленно мерцали, если хотите */
+    @keyframes twinkling {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .star {
+        animation: twinkling 5s infinite;
+    }
+
+
+    #moon {
+        width: 80px;
+        height: 80px;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: none;
+    }
+
+    #moon img {
+        width: 100%;
+        height: auto;
+    }
+
+
+    #win-message {
+        position: absolute;
+        bottom: -150px;
+        left: 375px;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        text-align: center;
+        color: white;
+    }
+
+    #restart-btn {
+        position: absolute;
+        bottom: -290px;
+        left: 375px;
+        transform: translateX(-50%);
+
+    }
+</style>
+
+<body>
+    <header>
+        <h1>Игры по Алгебре</h1>
+        <div class="sidebar">
+            <input type="checkbox" id="navcheck" role="button" title="menu" hidden>
+            <label for="navcheck" aria-hidden="true" title="menu">
+                <span class="burger">
+                    <span class="bar">
+                        <span class="visuallyhidden">Menu</span>
+                    </span>
+                </span>
+            </label>
+            <nav id="menu">
+                <a href="index.html">Главная</a>
+                <a href="linear-equations.html">Линейные функции</a>
+                <a href="quadratic-functions.html">Квадратичные функции</a>
+                <a href="systems-of-equations.html">Системы уравнений</a>
+                <a href="roots-and-degrees.html">Корни и степени</a>
+                <a href="rational-expressions.html">Рациональные и иррациональные числа</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h1>Интерактивные Алгебраические Игры</h1>
+            <p>Здесь вы можете практиковать свои навыки в алгебре, играя в интерактивные игры.</p>
+        </div>
+        <div class="container">
+            <h1>Игра "Свойства умножения"</h1>
+            <p>Соотнесите карточки согласно переместительному, сочетательному и распределительному свойствам умножения.
+            </p>
+            <div id="gameBoard"></div>
+            <button button onclick="setupGame()" id="startButton">Начать игру</button>
+        </div>
+        <div class="container">
+            <h1>Игра "Правила сокращённого умножения"</h1>
+            <p>Соотнесите карточки согласно правилам сокращённого умножения.
+            </p>
+            <div id="gameBoard1">
+                <div id="leftCards"></div>
+                <div id="rightCards"></div>
+
+                <button id="check">Проверить</button>
+
+            </div>
+        </div>
+        <div class="container" id="container" style="padding: 0px; border-radius: 8px; width: 800px;">
+            <div id="instructions">
+                <h1 style="padding: 30px;">Арифметические выражения</h1>
+                <p style="padding: 30px;">И луна не даст света своего,
+                и звезды спадут с неба.
+                <br>
+                Выставите правильный порядок действий в предложенных выражений, чтобы восстановить звёздное небо.</p>
+                <button id="start-btn" style="margin: 30px;">Начать игру</button>
+            </div>
+            <div class="game-container" id="game-container"
+                style="display: none; border-radius: 8px; width: 800px; min-height: 400px; margin: auto;">
+                <div id="stars"></div>
+                <div id="moon" style="display: none;">
+                    <img src="images/moon.png" alt="Луна">
+                    <div id="win-message">Звездное небо восстановлено!</div>
+                    <div id="restart-container" style="display: none;">
+                        <button id="restart-btn" style="padding: 10px; width: 160px;">Начать заново</button>
+                    </div>
+                </div>
+                <div id="difficulty">
+                    <label style="color: rgb(255, 255, 255);"><input type="radio" name="difficulty" value="easy"
+                            checked> Лёгкая</label>
+                    <label style="color: rgb(255, 255, 255);"><input type="radio" name="difficulty" value="medium">
+                        Средняя</label>
+                    <label style="color: rgb(255, 255, 255);"><input type="radio" name="difficulty" value="hard">
+                        Сложная</label>
+                </div>
+                <br><br><br><br><br><br>
+                <div id="expression"></div>
+                <br>
+                <div id="cards"></div>
+                <br>
+                <button id="check-btn" style="margin: 30px;">Проверить</button>
+            </div>
+        </div>
+
+    </main>
+    <script>
+        document.getElementById('startButton').addEventListener('click', setupGame);
+
+        const expressions = [
+            { id: 1, content: "a + b", matchId: 2 },
+            { id: 2, content: "b + a", matchId: 1 },
+            { id: 3, content: "(a + b) + c", matchId: 4 },
+            { id: 4, content: "a + (b + c)", matchId: 3 },
+            { id: 5, content: "a * (b + c)", matchId: 6 },
+            { id: 6, content: "a * b + a * c", matchId: 5 },
+            { id: 7, content: "a * b", matchId: 8 },
+            { id: 8, content: "b * a", matchId: 7 }
+        ];
+        let flippedCards = [];
+        let matchesFound = 0;
+
+        function shuffle(array) {
+            array.sort(() => Math.random() - 0.5);
+        }
+
+        function setupGame() {
+            document.getElementById('gameBoard').innerHTML = '';
+            shuffle(expressions);
+            expressions.forEach(expression => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-id', expression.id);
+                card.onclick = () => flipCard(card, expression.id);
+                document.getElementById('gameBoard').appendChild(card);
+            });
+            flippedCards = [];
+            matchesFound = 0;
+        }
+
+        function flipCard(card, id) {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+                card.textContent = expressions.find(expression => expression.id === id).content;
+                flippedCards.push({ card, id });
+
+                if (flippedCards.length === 2) {
+                    setTimeout(checkForMatch, 1000);
+                }
+            }
+        }
+
+        function checkForMatch() {
+            const [firstCard, secondCard] = flippedCards;
+            if (firstCard.id === expressions.find(expression => expression.id === secondCard.id).matchId) {
+                matchesFound++;
+                flippedCards.forEach(flippedCard => flippedCard.card.classList.add('matched'));
+                if (matchesFound === expressions.length / 2) {
+                    alert('Молодец! Все равенства найдены.');
+                }
+            } else {
+                flippedCards.forEach(flippedCard => flippedCard.card.classList.remove('flipped'));
+                flippedCards.forEach(flippedCard => flippedCard.card.textContent = '');
+            }
+            flippedCards = [];
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const leftSide = document.getElementById('leftCards');
+            const rightSide = document.getElementById('rightCards');
+            const checkButton = document.getElementById('check');
+            let selectedCard = null;
+            let matches = [];
+
+            // List of algebraic identities as pairs of left and right expressions
+            const identities = [
+                { left: '(a+b)²', right: 'a²+2ab+b²' },
+                { left: '(a-b)²', right: 'a²-2ab+b²' },
+                { left: '(a+b)(a-b)', right: 'a²-b²' },
+                { left: '(a+b)(a²-ab+b²)', right: 'a³+b³' },
+                { left: '(a-b)(a²+ab+b²)', right: 'a³-b³' },
+                { left: '(a+b)³', right: 'a³+3a²b+3ab²+b³' },
+                { left: '(a-b)³', right: 'a³-3a²b+3ab²-b³' }
+            ];
+
+            // Shuffles an array in place
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            // Shuffles the identities and distributes them to left and right sides
+            function setupGame() {
+                shuffle(identities);
+                leftSide.innerHTML = '';
+                rightSide.innerHTML = '';
+                identities.forEach((identity, index) => {
+                    const leftCard = createCard(identity.left, index, 'left');
+                    const rightCard = createCard(identity.right, index, 'right');
+                    leftSide.appendChild(leftCard);
+                    rightSide.appendChild(rightCard);
+                });
+            }
+
+            // Creates a card element
+            function createCard(content, index, side) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.textContent = content;
+                card.dataset.index = index;
+                card.dataset.side = side;
+                card.addEventListener('click', selectCard);
+                return card;
+            }
+
+            // Handles card selection
+            function selectCard(event) {
+                const card = event.target;
+                if (selectedCard) {
+                    if (selectedCard.dataset.index === card.dataset.index &&
+                        selectedCard.dataset.side !== card.dataset.side) {
+                        // It's a match
+                        matches.push(card.dataset.index);
+                        card.classList.add('matched');
+                        selectedCard.classList.add('matched');
+                    } else {
+                        // Not a match
+                        card.classList.add('mismatch');
+                        selectedCard.classList.add('mismatch');
+                    }
+                    selectedCard = null;
+                } else {
+                    // First card selected
+                    card.classList.add('selected');
+                    selectedCard = card;
+                }
+            }
+
+            // Checks if all matches are found
+            function checkMatches() {
+                if (matches.length === identities.length) {
+                    alert('Все равентсва найдены!');
+                } else {
+                    alert('Некоторые равенства не найдены или найдены неверно.');
+                }
+                // Reset matches for a new game
+                matches = [];
+                setupGame();
+            }
+
+            checkButton.addEventListener('click', checkMatches);
+
+            // Initialize the game
+            setupGame();
+        });
+
+        const instructions = document.getElementById("instructions");
+        const startBtn = document.getElementById("start-btn");
+        const gameContainer = document.getElementById("game-container");
+        const difficultyRadios = document.querySelectorAll('input[name="difficulty"]');
+        let selectedDifficulty = 'easy';
+        let currentExpression = '';
+        let correctAnswersCount = 0;
+        const operators = ["+", "-", "*", "/"];
+        const expressionElement = document.getElementById("expression");
+        const cardsElement = document.getElementById("cards");
+        const checkBtn = document.getElementById("check-btn");
+        const operatorsPriority = {
+            '*': 2,
+            '/': 2,
+            '+': 1,
+            '-': 1
+        };
+        difficultyRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                selectedDifficulty = radio.value;
+                generateExpressionAndRender();
+            });
+        });
+        startBtn.addEventListener('click', () => {
+            instructions.style.display = 'none';
+            gameContainer.style.display = 'block';
+            generateExpressionAndRender();
+        });
+
+        function generateExpression() {
+            let numOperators;
+            switch (selectedDifficulty) {
+                case 'easy':
+                    numOperators = 2;
+                    break;
+                case 'medium':
+                    numOperators = 3;
+                    break;
+                case 'hard':
+                    numOperators = 4;
+                    break;
+                default:
+                    numOperators = 2;
+            }
+
+            let numbers = [];
+            for (let i = 0; i < numOperators + 1; i++) {
+                numbers.push(Math.floor(Math.random() * 10) + 1);
+            }
+
+            let expression = "";
+            for (let i = 0; i < numbers.length; i++) {
+                expression += numbers[i];
+                if (i < numbers.length - 1) {
+                    expression += operators[Math.floor(Math.random() * operators.length)];
+                }
+            }
+
+            if (Math.random() > 0.5) {
+                expression = `(${expression})`;
+            }
+
+            return expression;
+        }
+
+        function createCards(expression) {
+            let cards = [];
+            let operatorsPriority = {
+                '*': 2,
+                '/': 2,
+                '+': 1,
+                '-': 1
+            };
+            let cardNumber = 1;
+            for (let i = 0; i < expression.length; i++) {
+                if (operators.includes(expression[i])) {
+                    // Create a card only for operations with priority
+                    if (operatorsPriority[expression[i]]) {
+                        cards.push(createCard(cardNumber));
+                        cardNumber++;
+                    }
+                }
+            }
+            return cards;
+        }
+
+        function createCard(number) {
+            let card = document.createElement("div");
+            card.className = "number";
+            card.textContent = number;
+            card.setAttribute("draggable", "true");
+            card.setAttribute("data-number", number); // Set data-number attribute
+
+            card.addEventListener("dragstart", dragStart);
+            card.addEventListener("dragover", dragOver);
+
+            return card;
+        }
+
+        function dragEnd(event) {
+            event.preventDefault();
+            let card = event.dataTransfer.card; // Access the card from the event object
+            let number = event.dataTransfer.number; // Access the number from the event object
+        }
+
+        function renderExpression(expression) {
+            let html = "";
+            for (let i = 0; i < expression.length; i++) {
+                if (operators.includes(expression[i])) {
+                    html += `<div class="expression-container"><span class="dropzone" ondragover="allowDrop(event)" ondrop="drop(event, ${i})"></span><span class="operator">${expression[i]}</span></div>`;
+                } else {
+                    html += `<span class="number">${expression[i]}</span>`;
+                }
+            }
+
+            expressionElement.innerHTML = html;
+        }
+
+        function renderCards(cards) {
+            cardsElement.innerHTML = "";
+            cards.forEach((card) => {
+                cardsElement.appendChild(card);
+            });
+        }
+
+        // Функция для вычисления значения операции
+        function evaluateOperation(a, b, operator) {
+            switch (operator) {
+                case '+':
+                    return a + b;
+                case '-':
+                    return a - b;
+                case '*':
+                    return a * b;
+                case '/':
+                    return a / b;
+                default:
+                    return NaN; // Если оператор не распознан, возвращаем NaN
+            }
+        }
+
+        function generateExpressionAndRender() {
+            currentExpression = generateExpression(); // Store the generated expression in the global variable
+            let cards = createCards(currentExpression);
+
+            renderExpression(currentExpression);
+            renderCards(cards);
+        }
+        // Функция для проверки корректности ответа пользователя
+        function checkAnswer() {
+            let dropzones = document.querySelectorAll('.dropzone');
+            let userOperators = '';
+
+            // Собираем порядок операций, установленный пользователем
+            dropzones.forEach(dropzone => {
+                let card = dropzone.querySelector('.number');
+                if (card) {
+                    userOperators += dropzone.nextElementSibling.textContent; // Собираем операторы
+                }
+            });
+
+            // Проверяем порядок операций пользователя
+            if (isCorrectOrder(userOperators)) {
+                dropzones.forEach(dropzone => {
+                    dropzone.classList.add("correct");
+                });
+                alert("Правильный порядок операций!");
+                correctAnswersCount++;
+
+                if (correctAnswersCount >= 10) {
+                    showMoon();
+                } else {
+                    addStar();
+                    addStar();
+                    addStar(); // Добавляем звезду при каждом правильном ответе
+                }
+            } else {
+                dropzones.forEach(dropzone => {
+                    dropzone.classList.add("incorrect");
+                });
+                alert("Неправильный порядок операций!");
+            }
+
+            // Удаляем подсветку через некоторое время и генерируем новое выражение
+            setTimeout(() => {
+                dropzones.forEach(dropzone => {
+                    dropzone.classList.remove("correct", "incorrect");
+                    dropzone.innerHTML = ''; // Очищаем содержимое зон для нового выражения
+                });
+                generateExpressionAndRender();
+            }, 1000);
+        }
+
+
+        function showMoon() {
+            let moonElement = document.getElementById("moon");
+            moonElement.style.display = "block";
+
+            // Скрыть игровое поле и показать кнопку "Начать заново"
+            document.getElementById("expression").style.display = "none";
+            document.getElementById("difficulty").style.display = "none";
+            document.getElementById("cards").style.display = "none";
+            document.getElementById("check-btn").style.display = "none";
+            document.getElementById("restart-container").style.display = "block";
+        }
+
+        function restartGame() {
+            // Очистить поле от лун, звёзд и выражений
+            document.getElementById("moon").style.display = "none";
+            document.getElementById("stars").innerHTML = "";
+
+            // Показать игровое поле
+            document.getElementById("game-container").style.display = "block";
+            document.getElementById("expression").style.display = "block";
+            document.getElementById("difficulty").style.display = "block";
+            document.getElementById("cards").style.display = "block";
+            document.getElementById("check-btn").style.display = "block";
+            // Скрыть кнопку "Начать заново"
+            document.getElementById("restart-container").style.display = "none";
+
+            // Сбросить счётчик правильных ответов
+            correctAnswersCount = 0;
+
+            // Генерация нового выражения
+            generateExpressionAndRender();
+        }
+
+        // Обработчик для кнопки "Начать заново"
+        document.getElementById("restart-btn").addEventListener("click", restartGame);
+
+
+
+        function addStar() {
+            let starsElement = document.getElementById("stars");
+            let star = document.createElement("div");
+            star.className = "star";
+            star.style.top = Math.random() * 100 + "%";
+            star.style.left = Math.random() * 100 + "%";
+            starsElement.appendChild(star);
+        }
+
+        function addStars(numStars) {
+            for (let i = 0; i < numStars; i++) {
+                addStar();
+            }
+        }
+
+
+        // Проверка правильного порядка операций
+
+        function isCorrectOrder(operators) {
+            const stack = [];
+            let lastOperator = null;
+            let hasPriorityOnRight = false;
+
+            for (let i = 0; i < operators.length; i++) {
+                if (operators[i] === '+' || operators[i] === '-') {
+                    // сложение и вычитание - выполняются в последнюю очередь
+                    while (stack.length && (stack[stack.length - 1] === '*' || stack[stack.length - 1] === '/')) {
+                        stack.pop();
+                    }
+                } else if (operators[i] === '*' || operators[i] === '/') {
+                    // умножение и деление - выполняются в первую очередь  
+                    hasPriorityOnRight = true;
+                }
+
+                stack.push(operators[i]);
+
+                if (lastOperator === operators[i]) {
+                    lastOperator = null;
+                    continue;
+                } else {
+                    lastOperator = operators[i];
+                }
+            }
+
+            if (hasPriorityOnRight && !stack.includes('+') && !stack.includes('-')) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Функция для вычисления значения выражения
+        function evaluateExpression(expression) {
+            let numbersStack = [];
+            let operatorsStack = [];
+
+            for (let i = 0; i < expression.length; i++) {
+                let char = expression[i];
+                if (!isNaN(char)) {
+                    numbersStack.push(parseInt(char));
+                } else if (char === '(') {
+                    operatorsStack.push(char);
+                } else if (char === ')') {
+                    while (operatorsStack.length && operatorsStack[operatorsStack.length - 1] !== '(') {
+                        let operator = operatorsStack.pop();
+                        let b = numbersStack.pop();
+                        let a = numbersStack.pop();
+                        numbersStack.push(evaluateOperation(a, b, operator));
+                    }
+                    operatorsStack.pop(); // Remove opening bracket
+                } else {
+                    while (operatorsStack.length && precedence(operatorsStack[operatorsStack.length - 1]) >= precedence(char)) {
+                        let operator = operatorsStack.pop();
+                        let b = numbersStack.pop();
+                        let a = numbersStack.pop();
+                        numbersStack.push(evaluateOperation(a, b, operator));
+                    }
+                    operatorsStack.push(char);
+                }
+            }
+
+            while (operatorsStack.length) {
+                let operator = operatorsStack.pop();
+                let b = numbersStack.pop();
+                let a = numbersStack.pop();
+                numbersStack.push(evaluateOperation(a, b, operator));
+            }
+
+            return numbersStack.pop();
+        }
+
+        function precedence(operator) {
+            switch (operator) {
+                case '+':
+                case '-':
+                    return 1;
+                case '*':
+                case '/':
+                    return 2;
+                default:
+                    return 0;
+            }
+        }
+
+        generateExpressionAndRender();
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drop(event, index) {
+            event.preventDefault();
+            let cardId = event.dataTransfer.getData("cardId");
+            let card = document.querySelector('.number[data-number="' + cardId + '"]');
+            let dropzone = event.target.closest('.dropzone');
+
+            // Check if dropzone is over an arithmetic sign cell
+            if (dropzone && dropzone.parentNode.classList.contains('expression-container')) {
+                dropzone.appendChild(card); // Just add the card to the cell
+            }
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function dragStart(event) {
+            event.dataTransfer.setData("cardId", event.target.getAttribute("data-number"));
+            event.dataTransfer.card = event.target; // Set the card as a property of the event object
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+            let draggedCardId = event.dataTransfer.getData("cardId");
+            let draggedCard = document.querySelector('.number[data-number="' + draggedCardId + '"]');
+
+            if (draggedCard) {
+                let dropzone = event.target.closest('.dropzone');
+                if (dropzone && dropzone.parentNode.classList.contains('expression-container')) {
+                    let boundingRect = dropzone.getBoundingClientRect();
+                    let offset = event.clientY - boundingRect.top;
+                    let middle = boundingRect.height / 2;
+                    if (offset > middle) {
+                        dropzone.parentNode.insertBefore(draggedCard, dropzone.parentNode.children[dropzone.parentNode.children.length - 1].nextSibling);
+                    } else {
+                        dropzone.parentNode.insertBefore(draggedCard, dropzone.parentNode.children[0]);
+                    }
+                }
+            }
+        }
+        checkBtn.addEventListener('click', checkAnswer);
+        document.getElementById("restart-btn").addEventListener("click", restartGame);
+    </script>
+</body>
+
+</html>

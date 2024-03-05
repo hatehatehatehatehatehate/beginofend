@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Линейные уравнения</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sidebar.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0056b3;
+        }
+        .problem {
+            margin: 20px 0;
+        }
+        .answer {
+            margin-top: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        label{
+            margin: 10px;
+        }
+        input{
+            margin: 10px;
+            margin-left: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Линейные уравнения и функции</h1>
+    </header>
+    <div class="sidebar">
+        <input type="checkbox" id="navcheck" role="button" title="menu" hidden>
+        <label for="navcheck" aria-hidden="true" title="menu">
+            <span class="burger">
+                <span class="bar">
+                    <span class="visuallyhidden">Menu</span>
+                </span>
+            </span>
+        </label>
+        <nav id="menu">
+            <a href="index.html">Главная</a>
+            <a href="quadratic-functions.html">Квадратичные функции</a>
+            <a href="systems-of-equations.html">Системы уравнений</a>
+            <a href="roots-and-degrees.html">Корни и степени</a>
+            <a href="rational-expressions.html">Рациональные и иррациональные числа</a>
+            <a href="Algebraic Games.html">Игры по алгебре</a>
+        </nav>
+    </div>
+    <div class="container">
+        <h2>Описание</h2>
+        <p>Линейное уравнение — это уравнение первой степени, которое выглядит как <code>ax + b = 0</code>, где <code>a</code> и <code>b</code> — числа, и <code>a ≠ 0</code>. Линейная функция представлена в виде <code>y = mx + c</code>, где <code>m</code> — угловой коэффициент (показывает уклон графика), а <code>c</code> — точка пересечения с осью Y.</p>
+        <div id="problem-section" class="problem">
+            <!-- Здесь будут генерироваться задачи -->
+        </div>
+    </div>
+    <div class="container">
+        <canvas id="linearChart"></canvas>
+    </div>   
+    <div class="container">
+        <label for="mValue">Угловой коэффициент (m): </label>
+        <input type="number" id="mValue" value="1">
+        <br>
+        <label for="cValue">Точка пересечения с осью Y (c): </label>
+        <input type="number" id="cValue" value="0">
+        <br>
+        <button onclick="updateGraph()">Обновить график</button>
+    </div>
+    <div class="container" id="quiz-container">
+        <h3>Квиз по линейным уравнениям</h3>
+        <div id="question"></div>
+        <input type="number" id="quiz-answer" placeholder="Введите ваш ответ">
+        <button onclick="submitQuizAnswer()">Отправить ответ</button>
+        <div id="quiz-feedback"></div>
+        <button onclick="generateQuizQuestion()">Следующий вопрос</button>
+    </div>       
+    <script>
+        function generateProblem() {
+            const a = Math.floor(Math.random() * 10) + 1; // Коэффициент a от 1 до 10
+            const b = Math.floor(Math.random() * 21) - 10; // Коэффициент b от -10 до 10
+            const answer = -b / a;
+
+            const problemSection = document.getElementById('problem-section');
+            problemSection.innerHTML = `
+                <p>Решите уравнение: <code>${a}x ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)} = 0</code></p>
+                <input type="number" id="user-answer" class="answer" placeholder="Ваш ответ" />
+                <button onclick="checkAnswer(${answer})">Проверить</button>
+                <p id="feedback"></p>
+            `;
+        }
+
+        function checkAnswer(correctAnswer) {
+            const userAnswer = parseFloat(document.getElementById('user-answer').value);
+            const feedback = document.getElementById('feedback');
+            if (userAnswer === correctAnswer) {
+                feedback.textContent = 'Правильно!';
+                feedback.style.color = 'green';
+            } else {
+                feedback.textContent = 'Неправильно, попробуйте еще раз.';
+                feedback.style.color = 'red';
+            }
+        }
+
+        // Генерируем первую задачу при загрузке страницы
+        window.onload = generateProblem;
+    </script>
+    <script>
+        var ctx = document.getElementById('linearChart').getContext('2d');
+        var linearChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [-10, -5, 0, 5, 10], // Пример диапазона значений x
+                datasets: [{
+                    label: 'Линейная функция',
+                    data: [0, 0, 0, 0, 0], // Начальные значения y
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    
+        function updateGraph() {
+            var m = document.getElementById('mValue').value;
+            var c = document.getElementById('cValue').value;
+            linearChart.data.datasets[0].data = linearChart.data.labels.map(x => m * x + parseInt(c));
+            linearChart.update();
+        }
+    </script>
+    <script>
+        let currentAnswer = 0;
+    
+        function generateQuizQuestion() {
+            const a = Math.floor(Math.random() * 9) + 2; // Коэффициент 'a' от 2 до 10
+            const b = Math.floor(Math.random() * 20) - 10; // Коэффициент 'b' от -10 до 10
+            currentAnswer = -b / a;
+            currentAnswer = parseFloat(currentAnswer.toFixed(2)); // Ограничиваем ответ до двух знаков после запятой
+    
+            const questionElement = document.getElementById('question');
+            questionElement.innerHTML = `Решите уравнение: ${a}x + (${b}) = 0`;
+        }
+    
+        function submitQuizAnswer() {
+            const userAnswer = parseFloat(document.getElementById('quiz-answer').value);
+            const feedbackElement = document.getElementById('quiz-feedback');
+    
+            if (userAnswer.toFixed(2) === currentAnswer.toFixed(2)) {
+                feedbackElement.innerHTML = 'Правильно! Отличная работа!';
+                feedbackElement.style.color = 'green';
+            } else {
+                feedbackElement.innerHTML = 'Неправильно. Попробуйте еще раз.';
+                feedbackElement.style.color = 'red';
+            }
+        }
+    
+        // Генерируем первый вопрос при загрузке страницы
+        window.onload = function() {
+            generateQuizQuestion();
+        };
+    </script>
+    
+</body>
+</html>

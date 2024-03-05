@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Quadratic Functions</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sidebar.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #000000;
+        }
+        .problem {
+            margin: 20px 0;
+        }
+        .answer {
+            margin-top: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Квадратичные функции</h1>
+        <div class="sidebar">
+            <input type="checkbox" id="navcheck" role="button" title="menu" hidden>
+            <label for="navcheck" aria-hidden="true" title="menu">
+                <span class="burger">
+                    <span class="bar">
+                        <span class="visuallyhidden">Menu</span>
+                    </span>
+                </span>
+            </label>
+            <nav id="menu">
+                <a href="index.html">Главная</a>
+                <a href="linear-equations.html">Линейные уравнения</a>
+                <a href="systems-of-equations.html">Системы уравнений</a>
+                <a href="roots-and-degrees.html">Корни и степени</a>
+                <a href="rational-expressions.html">Рациональные и иррациональные числа</a>
+                <a href="Algebraic Games.html">Игры по алгебре</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Описание</h2>
+            <p>Квадратичные функции - это полиномиальные функции степени два. Стандартный вид f(x) = ax^2 + bx + c, где a, b и c - константы, причем a ≠ 0. Графиком квадратичной функции является парабола.</p>
+        </div>
+        <div class="container">
+            <h2>Калькулятор квадратичных функций</h2>
+            <p>Введите коэффициенты a, b и c, чтобы найти корни квадратного уравнения:</p>
+            <!-- Input fields and button for calculation -->
+            <div id="calculator">
+                <input type="number" id="a-coeff" placeholder="a">
+                <input type="number" id="b-coeff" placeholder="b">
+                <input type="number" id="c-coeff" placeholder="c">
+                <br>
+                <button onclick="calculateRoots()">Вычислить корни</button>
+                <button onclick="updateGraphButton()" id="updateGraphButton">Обновить график</button>
+                <div id="result"></div>
+            </div>
+        </div>
+                <div class="container"><canvas id="quadraticChart" width="600" height="600"></canvas></div>
+                
+                <div id="result"></div>
+        
+        <!-- Optional: Section for graph visualization -->
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

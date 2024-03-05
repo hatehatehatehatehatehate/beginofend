@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гонка решений</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #000000;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            z-index: 0;
+            position: relative;
+        }
+
+        .track {
+            width: 600px;
+            height: 200px;
+            border: 1px solid #ccc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #car1,
+        #car2 {
+            position: absolute;
+            bottom: 0;
+        }
+
+        #car1 {
+            top: 118px;
+            left: 0;
+            width: 150px;
+        }
+
+        #car2 {
+            bottom: -5px;
+            left: 0;
+            width: 150px;
+        }
+
+        .equation-area {
+            width: 400px;
+            margin: 30px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            display: none;
+        }
+
+        #equation {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .answer-button {
+            padding: 10px;
+            margin: 2px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .controls {
+            text-align: center;
+        }
+
+        #start {
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #difficulty {
+            margin-left: 10px;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        .track1 {
+            background: radial-gradient(circle at 50%, #352849, #000000, #012d3d, #311b81);
+            background-size: 400% 400%;
+            border-radius: 8px;
+            animation: gradientAnimation 30s ease infinite;
+            z-index: -1;
+            box-shadow: 0px 0px 20px rgb(0, 102, 255);
+        }
+    </style>
+</head>
+
+<body>
+        <header>
+            <h1>Гонка решений</h1>
+        </header>
+        <div class="container" style="z-index: -1;">
+            <h3 style="text-align: center; padding: 10px;">Выберите уровень сложности, начните игру и решайте линейные уравнения, чтобы обогнать своего соперника и прийти к финишу первым. Удачи!</h3>
+        <div class="game-area">
+            <div class="track1">
+                <div class="track" style="background-image: url(/images/trassa.png); background-size: 600px 200px; border-radius: 8px; border: none;">
+                    <img id="car1" src="images/car1.png" alt="Ваша машина">
+                    <img id="car2" src="images/car2.png" alt="Машина соперника">
+                </div>
+            </div>
+            <div id="equation-area" class="equation-area">
+                <p id="equation"></p>
+                <div id="answers"></div>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="start">Начать игру</button>
+            <select id="difficulty">
+                <option value="easy">Легкий</option>
+                <option value="medium">Средний</option>
+                <option value="hard">Сложный</option>
+            </select>
+        </div>
+    </div>
+    <script>
+        const car1 = document.getElementById('car1');
+        const car2 = document.getElementById('car2');
+        const equationElement = document.getElementById('equation');
+        const answersContainer = document.getElementById('answers');
+        const startButton = document.getElementById('start');
+        const difficultySelect = document.getElementById('difficulty');
+
+        let car1Position = 0;
+        let car2Position = 0;
+        let currentEquation;
+        let difficulty;
+        let opponentAnimation;
+
+        function startGame() {
+            document.getElementById("equation-area").style.display = "block";
+            car1Position = 0;
+            car2Position = 0;
+            anime.set(car1, { left: 0 });
+            anime.set(car2, { left: 0 });
+            difficulty = difficultySelect.value;
+            generateEquation();
+            if (opponentAnimation) opponentAnimation.pause();
+            const speed = getOpponentSpeed(difficulty);
+            moveOpponentCar(speed);
+        }
+
+        function moveOpponentCar(speed) {
+            opponentAnimation = anime({
+                targets: car2,
+                left: 600,
+                duration: speed,
+                easing: 'linear',
+                complete: function () {
+                    alert('Вы проиграли!');
+                    startGame();
+                }
+            });
+        }
+
+        function getOpponentSpeed(difficulty) {
+            switch (difficulty) {
+                case 'easy':
+                    return 50000;
+                case 'medium':
+                    return 45000;
+                case 'hard':
+                    return 40000;
+                default:
+                    return 50000;
+            }
+        }
+
+        function generateEquation() {
+            const a = Math.floor(Math.random() * 10) + 1;
+            const b = Math.floor(Math.random() * 10) + 1;
+            const operator = ['+', '-'][Math.floor(Math.random() * 2)];
+            let x;
+            if (operator === '+') {
+                x = a + b;
+                currentEquation = `${a} + ${b} = x`;
+            } else {
+                x = a - b;
+                currentEquation = `${a} - ${b} = x`;
+            }
+            equationElement.textContent = currentEquation;
+            generateAnswerButtons(x);
+        }
+
+        function generateAnswerButtons(x) {
+            const answers = [];
+            for (let i = 0; i < 4; i++) {
+                let answer;
+                if (i === 0) {
+                    answer = x;
+                } else {
+                    let randNum;
+                    do {
+                        randNum = getRandomInt(x - 5, x + 5);
+                    } while (answers.includes(randNum) || randNum === x);
+                    answer = randNum;
+                }
+                answers.push(answer);
+            }
+            answers.sort(() => Math.random() - 0.5); // shuffle the answers array
+            answersContainer.innerHTML = ''; // Clear previous buttons
+            answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.textContent = answer;
+                button.classList.add('answer-button');
+                button.addEventListener('click', function () {
+                    if (parseInt(this.textContent) === x) {
+                        car1Position += 10;
+                        anime({
+                            targets: car1,
+                            left: car1Position,
+                            duration: 500,
+                            easing: 'linear'
+                        });
+                        if (car1Position >= 600) {
+                            alert('Вы выиграли!');
+                            startGame();
+                        } else {
+                            generateEquation();
+                        }
+                    } else {
+                        generateEquation();
+                    }
+                });
+                answersContainer.appendChild(button);
+            });
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        startButton.addEventListener('click', startGame);
+    </script>
+</body>
+
+</html>

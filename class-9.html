@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roots and Degrees</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sidebar.css">
+</head>
+<style>
+    #progress-container {
+        width: 100%;
+        background-color: #eee;
+        margin: 20px 0;
+    }
+
+    #progress-bar {
+        height: 20px;
+        background-color: #4CAF50;
+        width: 0%;
+        /* Initial width */
+        transition: width 0.5s ease-in-out;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        margin-top: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: #000000;
+    }
+
+    .problem {
+        margin: 20px 0;
+    }
+
+    .answer {
+        margin-top: 10px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+    a{
+        text-decoration: none;
+        color: white;
+    }
+</style>
+
+<body>
+    <header>
+        <h1>9 класс</h1>
+        <div class="sidebar">
+            <input type="checkbox" id="navcheck" role="button" title="menu" hidden>
+            <label for="navcheck" aria-hidden="true" title="menu">
+                <span class="burger">
+                    <span class="bar">
+                        <span class="visuallyhidden">Menu</span>
+                    </span>
+                </span>
+            </label>
+            <nav id="menu">
+                <a href="index.html">Главная</a>
+                <a href="quadratic-functions.html">Квадратичные функции</a>
+                <a href="systems-of-equations.html">Системы уравнений</a>
+                <a href="linear-equations.html">Линейные уравнения</a>
+                <a href="rational-expressions.html">Рациональные и иррациональные числа</a>
+                <a href="Algebraic Games.html">Игры по алгебре</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Описание</h2>
+            <p>Основные темы, которые изучают учащиеся в 6 классе: <b>"Квадратичная функция"</b>, <b>"Алгебраические дроби"</b>, <b>"Иррациональные выражения и уравнения"</b></p>
+            </div>
+        <div class="container">
+            <h2>Квадратичная функция</h2>
+            <p>Детальное изучение квадратных функций, их свойств, графиков и применения.</p>
+            <button><a href="quadratic-functions.html">Перейти к теме</a></button>
+        </div>
+        <div class="container">
+            <h2>Алгебраические дроби</h2>
+            <p>Операции с алгебраическими дробями, упрощение выражений, решение уравнений.</p>
+            <button><a href="">Перейти к теме</a></button>
+        </div>
+        <div class="container">
+            <h2>Иррациональные выражения и уравнения</h2>
+            <p>Работа с иррациональными числами, упрощение выражений, решение уравнений с иррациональными корнями.</p>
+            <button><a href="">Перейти к теме</a></button>
+        </div>
+    </main>
+    <script src="script.js"></script>
+    <script>
+    </script>
+</body>
+
+</html>

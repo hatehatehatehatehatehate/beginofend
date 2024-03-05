@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Фракционные приключения</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-size: 1000% 1000%;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0056b3;
+        }
+
+        button {
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        label {
+            margin: 10px;
+        }
+
+        canvas {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            z-index: -1;
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+
+        #problemContainer {
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #player {
+            position: absolute;
+            bottom: -10px;
+            left: 600px;
+            width: 100px;
+            height: 120px;
+            background-image: url('images/player.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Математический марафон: крестики нолики</h1>
+    </header>
+    <div class="container">
+        <p>
+        <h3 style="padding-bottom: 10px;">Вас занесло в другой мир, чтобы снова попасть на Землю решайте задачи с
+            дробями. Удачи!</h3>
+        </p>
+        <div id="problemContainer"></div>
+        <div id="answerButtons">
+            <!-- Buttons for answer choices will be added here dynamically -->
+        </div>
+        <div id="player"></div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </div>
+    <script>
+        const Game = (function () {
+            const canvas = document.getElementById("gameCanvas");
+            const ctx = canvas.getContext("2d");
+            const problemContainer = document.getElementById("problemContainer");
+            const answerButtonsContainer = document.getElementById("answerButtons");
+            const player = document.getElementById("player");
+
+            let currentWorld = 0;
+            const worlds = [
+                { name: "Мир простых дробей", bgImage: "images/world1.png", fractionType: "simple", correctAnswer: "5" },
+                { name: "Мир десятичных дробей", bgImage: "images/world2.png", fractionType: "decimal", correctAnswer: "7" },
+                { name: "Мир смешанных чисел", bgImage: "images/world3.png", fractionType: "mixed", correctAnswer: "9" },
+                { name: "Земля", bgImage: "images/world4.png" }
+            ];
+
+            let worldBgImage = null;
+            let correctAnswers = 0;
+            const requiredAnswers = 5;
+            let playerPosition = 0;
+
+            function loadWorldImage() {
+                worldBgImage = new Image();
+                worldBgImage.onload = drawWorld;
+                worldBgImage.onerror = handleImageLoadError;
+                worldBgImage.src = worlds[currentWorld].bgImage;
+            }
+
+            function handleImageLoadError() {
+                console.error(`Ошибка загрузки изображения: ${this.src}`);
+            }
+
+            function drawWorld() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (worldBgImage) {
+                    ctx.drawImage(worldBgImage, 0, 0, canvas.width, canvas.height);
+                }
+                drawText();
+                drawPlayer();
+            }
+
+            function drawText() {
+                ctx.font = "30px Arial";
+                ctx.fillStyle = "white";
+                ctx.fillText(worlds[currentWorld].name, 10, 30);
+            }
+
+            function drawPlayer() {
+                player.style.left = playerPosition + 600 + "px";
+            }
+
+            function movePlayer() {
+                const playerWidth = 100;
+                const canvasWidth = canvas.width;
+
+                playerPosition += 100; // Перемещение игрока на 100 пикселей вправо
+
+                if (playerPosition + playerWidth >= canvasWidth) {
+                    if (currentWorld < worlds.length - 1) {
+                        currentWorld++;
+                        playerPosition = 0;
+                        loadWorldImage(); // Загрузка нового изображения фона
+                        solveFractionProblem();
+                    } else {
+                        alert("Поздравляем! Вы добрались до Земли!");
+                    }
+                }
+
+                drawPlayer();
+            }
+
+
+            // Функция для генерации задач с дробями
+            function generateFractionProblem() {
+                let problem;
+                const fractionType = worlds[currentWorld].fractionType;
+
+                if (fractionType === "simple") {
+                    const numerator1 = Math.floor(Math.random() * 10) + 1;
+                    const denominator1 = Math.floor(Math.random() * 10) + 1;
+                    const numerator2 = Math.floor(Math.random() * 10) + 1;
+                    const denominator2 = Math.floor(Math.random() * 10) + 1;
+                    const operation = ["+", "-", "*", "/"][Math.floor(Math.random() * 4)];
+                    problem = `${numerator1}/${denominator1} ${operation} ${numerator2}/${denominator2}`;
+                } else if (fractionType === "decimal") {
+                    const num1 = Math.random();
+                    const num2 = Math.random();
+                    const operation = ["+", "-", "*", "/"][Math.floor(Math.random() * 4)];
+                    problem = `${num1} ${operation} ${num2}`;
+                } else if (fractionType === "mixed") {
+                    const wholeNumber1 = Math.floor(Math.random() * 10);
+                    const numerator1 = Math.floor(Math.random() * 10) + 1;
+                    const denominator1 = Math.floor(Math.random() * 10) + 1;
+                    const wholeNumber2 = Math.floor(Math.random() * 10);
+                    const numerator2 = Math.floor(Math.random() * 10) + 1;
+                    const denominator2 = Math.floor(Math.random() * 10) + 1;
+                    const operation = ["+", "-", "*", "/"][Math.floor(Math.random() * 4)];
+                    problem = `${wholeNumber1} ${numerator1}/${denominator1} ${operation} ${wholeNumber2} ${numerator2}/${denominator2}`;
+                }
+
+                return problem;
+            }
+
+            // Функция для отображения кнопок с вариантами ответов
+            function showAnswerButtons() {
+                answerButtonsContainer.innerHTML = ""; // Очистка предыдущих кнопок
+
+                const answers = generateAnswerChoices();
+                answers.forEach(answer => {
+                    const button = document.createElement("button");
+                    button.textContent = answer;
+                    button.addEventListener("click", () => checkAnswer(answer));
+                    answerButtonsContainer.appendChild(button);
+                });
+            }
+
+            // Функция для генерации вариантов ответов
+            function generateAnswerChoices() {
+                const correctAnswer = worlds[currentWorld].correctAnswer;
+                const choices = [correctAnswer];
+
+                while (choices.length < 4) {
+                    const randomAnswer = Math.floor(Math.random() * 10) + 1;
+                    if (!choices.includes(randomAnswer.toString())) {
+                        choices.push(randomAnswer.toString());
+                    }
+                }
+
+                return shuffleArray(choices);
+            }
+
+            // Функция для перемешивания массива (алгоритм Фишера-Йетса)
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // Функция для проверки ответа
+            function checkAnswer(answer) {
+                const correctAnswer = worlds[currentWorld].correctAnswer;
+
+                if (answer === correctAnswer) {
+                    correctAnswers++;
+                    if (correctAnswers === requiredAnswers) {
+                        movePlayer();
+                        if (currentWorld === worlds.length - 1) {
+                            alert("Поздравляем! Вы добрались до Земли!");
+                        } else {
+                            currentWorld++;
+                            correctAnswers = 0;
+                            solveFractionProblem();
+                        }
+                    } else {
+                        solveFractionProblem();
+                    }
+                } else {
+                    solveFractionProblem();
+                }
+            }
+
+            // Функция для решения задачи с дробями
+            function solveFractionProblem() {
+                let problem = generateFractionProblem();
+                problemContainer.textContent = problem;
+                showAnswerButtons();
+            }
+
+            // Функция для запуска игрового цикла
+            function gameLoop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawWorld();
+
+                requestAnimationFrame(gameLoop);
+            }
+
+            function init() {
+                loadWorldImage();
+                solveFractionProblem();
+                gameLoop();
+            }
+
+            return {
+                init: init
+            };
+        })();
+
+        Game.init();
+    </script>
+</body>
+
+</html>

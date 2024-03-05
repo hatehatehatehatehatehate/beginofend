@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математический марафон: крестики нолики</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sidebar.css">
+</head>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        margin-top: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: #000000;
+    }
+
+    button {
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        margin: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    label {
+        margin: 10px;
+    }
+
+    input {
+        margin: 10px;
+        margin-left: 0;
+    }
+
+    #gameBoard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin: 20px;
+    }
+
+    #container {
+        width: 800px;
+        margin: 20px auto;
+        text-align: center;
+        position: relative;
+    }
+
+    .expression-container {
+        display: inline-block;
+        position: relative;
+    }
+
+    #game-board {
+        display: grid;
+        grid-template-columns: repeat(3, 100px);
+        grid-gap: 10px;
+        margin-top: 20px;
+        justify-content: center;
+
+    }
+
+    .cell {
+        width: 100px;
+        height: 100px;
+        border: 2px solid #6c80f1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 50px;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+    .difficulty-level{
+        display: flex;
+        justify-content: center;
+    }
+    input{
+        border-radius: 8px;
+        padding: 10px;
+        border-color: #c4c4c4;
+    }
+</style>
+
+<body>
+    <header> <h1>Математический марафон: крестики нолики</h1></header>
+    <div class="container">
+        <p><h3 style="padding: 20px;">Выберите уровень сложности и решайте алгебраические выражения, для того чтобы победить оппонента в игре "Крестики-нолики". Удачи!</h3></p>
+    <div class="difficulty-level" id="difficulty-level">
+        <button id="easy">Легкий</button>
+        <button id="medium">Средний</button>
+        <button id="hard">Сложный</button>
+    </div>
+    <div class="container">
+    <div id="problem"></div>
+    <input type="text" id="answer" placeholder="Введите ответ">
+    <button id="check">Проверить</button>
+</div>
+    <div id="game-board">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+    </div>
+    <div id="result"></div>
+</div>
+    <script>
+        const easyButton = document.getElementById('easy');
+        const mediumButton = document.getElementById('medium');
+        const hardButton = document.getElementById('hard');
+        const problemDiv = document.getElementById('problem');
+        const answerInput = document.getElementById('answer');
+        const checkButton = document.getElementById('check');
+        const gameBoard = document.getElementById('game-board');
+        const resultDiv = document.getElementById('result');
+        const cells = document.querySelectorAll('.cell');
+
+        let currentPlayer = 'X';
+        let gameOver = false;
+        let difficulty;
+
+        // Функции для генерации случайных чисел и математических операций
+        function getRandomNumber(max) {
+            return Math.floor(Math.random() * max) + 1;
+        }
+
+        function getRandomOperation() {
+            const operations = ['+', '-', '*'];
+            return operations[Math.floor(Math.random() * operations.length)];
+        }
+
+        // Функция для генерации математических задач
+        function generateProblem() {
+            let num1, num2, operation;
+            switch (difficulty) {
+                case 'easy':
+                    num1 = getRandomNumber(20);
+                    num2 = getRandomNumber(20);
+                    operation = ['+', '-'][Math.floor(Math.random() * 2)];
+                    break;
+                case 'medium':
+                    num1 = getRandomNumber(10);
+                    num2 = getRandomNumber(10);
+                    operation = '*';
+                    break;
+                case 'hard':
+                    num1 = getRandomNumber(100);
+                    num2 = getRandomNumber(100);
+                    operation = getRandomOperation();
+                    break;
+            }
+
+            // Гарантируем, что результат будет целым числом
+            if (operation === '/') {
+                while (num1 % num2 !== 0) {
+                    num1 = getRandomNumber(100);
+                    num2 = getRandomNumber(100);
+                }
+            }
+
+            const problem = `${num1} ${operation} ${num2}`;
+            problemDiv.textContent = problem;
+        }
+
+        // Функция для проверки ответа
+        function checkAnswer() {
+            const userAnswer = parseInt(answerInput.value);
+            const [num1, operation, num2] = problemDiv.textContent.split(' ');
+            let correctAnswer;
+            switch (operation) {
+                case '+':
+                    correctAnswer = parseInt(num1) + parseInt(num2);
+                    break;
+                case '-':
+                    correctAnswer = parseInt(num1) - parseInt(num2);
+                    break;
+                case '*':
+                    correctAnswer = parseInt(num1) * parseInt(num2);
+                    break;
+                case '/':
+                    correctAnswer = parseInt(num1) / parseInt(num2);
+                    break;
+            }
+
+            if (userAnswer === correctAnswer) {
+                answerInput.style.backgroundColor = 'green';
+                setTimeout(() => {
+                    answerInput.style.backgroundColor = 'white';
+                }, 500); // Задержка в 500 миллисекунд
+                makeMove(currentPlayer);
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            } else {
+                answerInput.style.backgroundColor = 'red';
+                setTimeout(() => {
+                    answerInput.style.backgroundColor = 'white';
+                }, 500); // Задержка в 500 миллисекунд
+                makeMove('O');
+                currentPlayer = 'X';
+            }
+
+            answerInput.value = '';
+            checkGameOver();
+            generateProblem();
+        }
+
+        // Функция для совершения хода
+        function makeMove(player) {
+            const emptyCells = Array.from(cells).filter(cell => cell.textContent === '');
+            if (emptyCells.length > 0) {
+                const randomIndex = Math.floor(Math.random() * emptyCells.length);
+                emptyCells[randomIndex].textContent = player;
+            }
+        }
+
+        // Функция для проверки окончания игры
+        function checkGameOver() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Горизонтальные линии
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Вертикальные линии
+                [0, 4, 8], [2, 4, 6] // Диагональные линии
+            ];
+
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (cells[a].textContent === cells[b].textContent && cells[b].textContent === cells[c].textContent && cells[a].textContent !== '') {
+                    gameOver = true;
+                    resultDiv.textContent = `${cells[a].textContent} победил!`;
+                    return;
+                }
+            }
+
+            const allCellsFilled = Array.from(cells).every(cell => cell.textContent !== '');
+            if (allCellsFilled) {
+                gameOver = true;
+                resultDiv.textContent = 'Ничья!';
+            }
+        }
+
+        // Обработчики событий для выбора уровня сложности
+        easyButton.addEventListener('click', () => {
+            difficulty = 'easy';
+            generateProblem();
+        });
+
+        mediumButton.addEventListener('click', () => {
+            difficulty = 'medium';
+            generateProblem();
+        });
+
+        hardButton.addEventListener('click', () => {
+            difficulty = 'hard';
+            generateProblem();
+        });
+
+        // Обработчик события для проверки ответа
+        checkButton.addEventListener('click', checkAnswer);
+    </script>
+</body>
+
+</html>

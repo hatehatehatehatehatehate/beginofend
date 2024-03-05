@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Рациональные Выражения</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sidebar.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
+        async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Рациональные и иррациональные числа</h1>
+        <div class="sidebar">
+            <input type="checkbox" id="navcheck" role="button" title="menu" hidden>
+            <label for="navcheck" aria-hidden="true" title="menu">
+                <span class="burger">
+                    <span class="bar">
+                        <span class="visuallyhidden">Menu</span>
+                    </span>
+                </span>
+            </label>
+            <nav id="menu">
+                <a href="index.html">Главная</a>
+                <a href="linear-equations.html">Линейные уравнения</a>
+                <a href="quadratic-functions.html">Квадратичные функции</a>
+                <a href="systems-of-equations.html">Системы уравнений</a>
+                <a href="roots-and-degrees.html">Корни и степени</a>
+                <a href="Algebraic Games.html">Игры по алгебре</a>
+            </nav>
+        </div>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                background-color: #f0f2f5;
+                color: #333;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: auto;
+                padding: 20px;
+                margin-top: 20px;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
+
+            h2 {
+                color: #000000;
+            }
+
+            .problem {
+                margin: 20px 0;
+            }
+
+            .answer {
+                margin-top: 10px;
+            }
+
+            button {
+                border-radius: 5px;
+                background-color: #007bff;
+                color: white;
+                padding: 10px 15px;
+                margin-top: 10px;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+        </style>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Описание</h2>
+            <p>Рациональные числа — это числа, которые можно выразить как отношение двух целых чисел, где знаменатель не
+                равен нулю. Они включают в себя целые числа, положительные и отрицательные дроби. Например, 1/2, -5,
+                4.25.</p>
+            <p>Иррациональные числа невозможно точно выразить как отношение двух целых чисел. Они включают числа,
+                которые имеют бесконечные неповторяющиеся десятичные дроби, такие как π (пи) или √2. Эти числа часто
+                возникают в геометрии, тригонометрии и других областях математики.</p>
+            <p>В этом разделе мы рассмотрим основные концепции рациональных и иррациональных чисел, демонстрируя их
+                свойства, различия и примеры, с целью улучшения вашего понимания этих важных математических понятий.</p>
+        </div>
+        <div class="container" id="game-container">
+            <h2>Определите число</h2>
+            <p>Решите, является ли следующее число рациональным или иррациональным:</p>
+            <div id="number-display"></div>
+            <button id="rational-btn">Рациональное</button>
+            <button id="irrational-btn">Иррациональное</button>
+            <p id="result"></p>
+        </div>
+        <div class="container">
+            <h2>Игра</h2>
+            <p>Нажимайте на рациональные выражения как можно быстрее!</p>
+            <div id="game" class="game-area"></div>
+            <div id="time" class="time-info"></div>
+            <div id="score" class="time-info"></div>
+            <div id="game-over" class="game-over-info"></div>
+            <button onclick="startGame()" id="start-btn">Начать игру</button>
+        </div>
+        <div class="container">
+            <div id="irrational-game">
+                <div class="card">
+                    <p>Число</p>
+                </div>
+            </div>
+            <div id="irrational-health">
+            </div>
+            <div id="irrational-result"></div>
+            <button id="irrational-start-btn">Начать игру</button>
+            <button id="irrational-finish-btn">Завершить игру</button>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const display = document.getElementById('number-display');
+            const resultDisplay = document.getElementById('result');
+            const rationalButton = document.getElementById('rational-btn');
+            const irrationalButton = document.getElementById('irrational-btn');
+            let currentNumber, isRational;
+
+            function generateNumber() {
+                if (Math.random() > 0.5) {
+                    // Rational number: either an integer or a fraction
+                    if (Math.random() > 0.5) {
+                        // Integer
+                        currentNumber = Math.floor(Math.random() * 20) - 10;
+                        isRational = true;
+                    } else {
+                        // Fraction
+                        let numerator = Math.floor(Math.random() * 10);
+                        let denominator = Math.floor(Math.random() * 9) + 1;
+                        currentNumber = numerator + '/' + denominator;
+                        isRational = true;
+                    }
+                } else {
+                    // Irrational number: square root or known constant (π)
+                    if (Math.random() > 0.5) {
+                        // Square root
+                        let radicand = Math.floor(Math.random() * 30) + 2;
+                        currentNumber = '√' + radicand;
+                        isRational = !Number.isInteger(Math.sqrt(radicand));
+                    } else {
+                        // Known constant (π)
+                        currentNumber = 'π';
+                        isRational = false;
+                    }
+                }
+                display.textContent = currentNumber;
+            }
+
+            rationalButton.onclick = function () {
+                checkAnswer(true);
+            };
+
+            irrationalButton.onclick = function () {
+                checkAnswer(false);
+            };
+
+            function checkAnswer(userGuess) {
+                if (userGuess === isRational) {
+                    resultDisplay.textContent = 'Правильно! Отличная работа!';
+                    resultDisplay.color = 'green';
+                } else {
+                    resultDisplay.textContent = 'Неправильно, попробуйте еще раз.';
+                    resultDisplay.color = 'red';
+                }
+                generateNumber();
+            }
+
+            generateNumber();
+        });
+
+        function startGame() {
+            document.getElementById('time').hidden = false;
+            document.getElementById('score').hidden = false;
+            const startBtn = document.getElementById('start-btn');
+            setupGameArea();
+            timeLeft = 30;
+            score = 0;
+            updateTimer(timeLeft);
+            updateScore(score);
+            gameInterval = setInterval(function () {
+                timeLeft--;
+                updateTimer(timeLeft);
+                if (timeLeft <= 0) {
+                    clearInterval(gameInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+        let timeLeft = 30;
+        let score = 0;
+        let gameInterval;
+
+
+        function setupGameArea() {
+            document.getElementById('start-btn').disabled = true;
+            const gameArea = document.getElementById('game');
+            gameArea.innerHTML = '';
+            gameArea.style.display = 'grid';
+            gameArea.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            gameArea.style.gap = '10px';
+            for (let i = 0; i < 9; i++) {
+                createExpressionButton(gameArea);
+            }
+        }
+
+        function createExpressionButton(gameArea) {
+            const button = document.createElement('button');
+            const { expression, isCorrect } = generateExpression();
+            button.textContent = expression;
+            button.style.margin = '5px';
+            button.onclick = function () {
+                if (isCorrect) {
+                    button.style.backgroundColor = 'green';
+                    score++;
+                } else {
+                    shakeButton(button);
+                    button.style.backgroundColor = 'red';
+                    score--;
+                }
+                updateScore(score);
+                setTimeout(() => {
+                    gameArea.removeChild(button);
+                    createExpressionButton(gameArea);
+                }, 500);
+            };
+            gameArea.appendChild(button);
+        }
+        function shakeButton(button) {
+            button.animate([
+                { transform: 'translateX(0px)' },
+                { transform: 'translateX(-10px)' },
+                { transform: 'translateX(10px)' },
+                { transform: 'translateX(0px)' }
+            ], {
+                // timing options
+                duration: 150,
+                iterations: 2
+            });
+        }
+
+        function generateExpression() {
+            const isRational = Math.random() > 0.5; // 50% chance for rational or irrational
+            let expression;
+
+            if (isRational) {
+                // Generate a rational number (integer or simple fraction)
+                if (Math.random() > 0.7) {
+                    // Simple integer
+                    expression = Math.floor(Math.random() * 20) - 10;
+                } else {
+                    // Simple fraction
+                    const numerator = Math.floor(Math.random() * 9) + 1;
+                    const denominator = Math.floor(Math.random() * 9) + 2; // Avoid 1 to make it interesting
+                    expression = `${numerator}/${denominator}`;
+                }
+            } else {
+                // Generate an irrational number (like square roots or π)
+                if (Math.random() > 0.5) {
+                    // Square root of a non-perfect square
+                    let radicand;
+                    do {
+                        radicand = Math.floor(Math.random() * 30) + 2;
+                    } while (Math.sqrt(radicand) % 1 === 0); // Ensure it's not a perfect square
+                    expression = `√${radicand}`;
+                } else {
+                    // Approximation of π or e
+                    expression = Math.random() > 0.5 ? 'π' : 'e';
+                }
+            }
+
+            return {
+                expression: expression,
+                isCorrect: isRational
+            };
+        }
+        function updateTimer(timeLeft) {
+            const timerElement = document.getElementById('time');
+            timerElement.textContent = `Время: ${timeLeft} сек`;
+        }
+
+        function updateScore(currentScore) {
+            const scoreElement = document.getElementById('score');
+            scoreElement.textContent = `Счет: ${currentScore}`;
+        }
+
+        function endGame() {
+            document.getElementById('start-btn').disabled = false; // Re-enable the start button
+            const gameArea = document.getElementById('game');
+            gameArea.innerHTML = `<p><h3>Игра окончена! Ваш итоговый счет: ${score}.<h3></p>`;
+            const finalMessage = score >= 10 ? "<h3>Молодец, отличная работа!<h3>" : "<h3>Над темой нужно ещё поработать.<h3>";
+            gameArea.innerHTML += `<p>${finalMessage}</p>`;
+            document.getElementById('time').hidden = true;
+            document.getElementById('score').hidden = true;
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const gameArea = document.getElementById('irrational-game');
+            const healthDisplay = document.getElementById('irrational-health');
+            const resultDisplay = document.getElementById('irrational-result');
+            const startButton = document.getElementById('irrational-start-btn');
+            const finishButton = document.getElementById('irrational-finish-btn');
+            let health = 3;
+            let score = 0;
+            let active = false;
+
+            const rationalNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            const irrationalNumbers = ['√2', 'π', 'e', '√3', '√5'];
+
+            function updateHealth() {
+                document.getElementById("irrational-health").hidden = false;
+                healthDisplay.textContent = 'Здоровье: ' + '❤️'.repeat(health);
+            }
+
+            function refreshGameArea() {
+                if (active) {
+                    const allNumbers = Array.from(gameArea.children).map(el => el.textContent);
+                    const onlyRational = allNumbers.every(number => rationalNumbers.includes(number) || !irrationalNumbers.includes(number));
+
+                    if (onlyRational && allNumbers.length > 0) {
+                        populateNumbers();
+                    }
+                }
+            }
+
+
+            function gameOver() {
+                active = false;
+                gameArea.innerHTML = '';
+                resultDisplay.textContent = "Игра окончена! Ваш счет:" + score;
+                startButton.disabled = false;
+                finishButton.disabled = true;
+                document.getElementById("irrational-health").hidden = true;
+            }
+
+            function populateNumbers() {
+                gameArea.innerHTML = '';
+                for (let i = 0; i < 10; i++) {
+                    const number = Math.random() > 0.5 ? rationalNumbers[Math.floor(Math.random() * rationalNumbers.length)] : irrationalNumbers[Math.floor(Math.random() * irrationalNumbers.length)];
+                    createNumberCard(number);
+                }
+            }
+            function createNumberCard(number) {
+                const numberElement = document.createElement('div');
+                numberElement.classList.add('button');
+                numberElement.textContent = number;
+                numberElement.addEventListener('click', () => {
+                    if (rationalNumbers.includes(number)) {
+                        health--;
+                        updateHealth();
+                        if (health === 0) {
+                            gameOver();
+                        }
+                    } else {
+                        score++;
+                        anime({
+                            targets: numberElement,
+                            opacity: [1, 0],
+                            scale: [1, 0],
+                            duration: 500,
+                            easing: 'easeInOutQuad',
+                            complete: () => {
+                                numberElement.remove();
+                                refreshGameArea(); // Refresh the game area after the element is removed
+                            }
+                        });
+                    }
+                });
+                gameArea.appendChild(numberElement);
+            }
+
+            function startGame() {
+                active = true;
+                health = 3;
+                score = 0;
+                updateHealth();
+                resultDisplay.textContent = '';
+                gameArea.style.display = 'grid';
+                gameArea.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                gameArea.style.gap = '10px';
+                populateNumbers();
+                startButton.disabled = true;
+                finishButton.disabled = false;
+
+                for (let i = 0; i < 10; i++) {
+                    const number = Math.random() > 0.5 ? rationalNumbers[Math.floor(Math.random() * rationalNumbers.length)] : irrationalNumbers[Math.floor(Math.random() * irrationalNumbers.length)];
+                    createNumberCard(number);
+                }
+
+                startButton.disabled = true;
+            }
+
+            startButton.addEventListener('click', startGame);
+            finishButton.addEventListener('click', gameOver);
+        });
+
+    </script>
+</body>
+
+</html>
